@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Decathlon — Trouve ta raquette</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3F7E;--navy-dark:#142E5E;--navy-light:#EEF2F9;
+  --green:#00843D;--red:#C8102E;
+  --bg:#F7F7F7;--white:#fff;--gray:#767676;--border:#E0E0E0;--text:#1A1A1A;
+}
+body{font-family:'Roboto',sans-serif;background:#CFD8E8;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;}
+.phone{width:390px;height:844px;background:var(--white);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 32px 72px rgba(0,0,0,.24),0 0 0 1px rgba(0,0,0,.08);}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;}
+.screen.active{opacity:1;pointer-events:all;}
+
+/* TRANSITIONS */
+.screen.slide-in{animation:slideIn .35s cubic-bezier(.4,0,.2,1) forwards;}
+.screen.slide-out{animation:slideOut .35s cubic-bezier(.4,0,.2,1) forwards;}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-40px)}}
+
+.sbar{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:12px;font-weight:700;flex-shrink:0;}
+
+/* ── S1 CATALOGUE ── */
+#s1{background:var(--white);}
+.topbar{background:var(--navy);padding:0 16px 12px;flex-shrink:0;}
+.topbar .sbar{color:#fff;background:transparent;padding:0;}
+.tnav{display:flex;align-items:center;justify-content:space-between;}
+.dec-logo{display:flex;align-items:center;gap:8px;}
+.dec-logo svg{height:22px;width:auto;}
+.cart-ic{font-size:21px;cursor:pointer;color:#fff;}
+.searchbar{background:#fff;border-radius:6px;padding:9px 14px;display:flex;align-items:center;gap:9px;margin-top:10px;color:var(--gray);font-size:13px;}
+.crumb{padding:10px 16px 3px;font-size:11px;color:var(--gray);}
+.crumb span{color:var(--navy);font-weight:600;}
+.cat-row{padding:5px 16px 8px;display:flex;align-items:center;justify-content:space-between;}
+.cat-title{font-family:'Roboto Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--text);}
+.cat-count{font-size:12px;color:var(--gray);}
+.chips{display:flex;gap:7px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.chip{border:1.5px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;white-space:nowrap;color:var(--text);font-weight:500;}
+.chip.on{border-color:var(--navy);color:var(--navy);background:var(--navy-light);}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);flex:1;overflow-y:auto;}
+.pc{background:#fff;position:relative;opacity:0;transform:translateY(16px);}
+.pc.reveal{animation:cardReveal .4s cubic-bezier(.4,0,.2,1) forwards;}
+@keyframes cardReveal{to{opacity:1;transform:translateY(0)}}
+.pc-img{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--bg);}
+.pc-badge{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:2px;}
+.pc-info{padding:9px 10px 12px;}
+.pc-brand{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;}
+.pc-name{font-size:12px;color:var(--text);margin:2px 0 3px;line-height:1.3;}
+.pc-price{font-family:'Roboto Condensed',sans-serif;font-size:19px;font-weight:700;color:var(--text);}
+.pc-stars{font-size:10px;color:var(--gray);}
+
+.banner{position:absolute;bottom:72px;left:12px;right:12px;background:var(--navy);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-shadow:0 6px 24px rgba(27,63,126,.38);opacity:0;animation:bp 2.5s ease-in-out 3s infinite, bannerFadeIn .5s .8s ease forwards;}
+@keyframes bannerFadeIn{to{opacity:1}}
+@keyframes bp{0%,100%{transform:scale(1)}50%{transform:scale(1.024)}}
+.ban-l{display:flex;align-items:center;gap:12px;}
+.ban-icon{width:40px;height:40px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.ban-txt strong{display:block;font-size:14px;font-weight:700;color:#fff;line-height:1.2;}
+.ban-txt small{font-size:11px;color:rgba(255,255,255,.7);}
+.ban-cta{background:#fff;color:var(--navy);font-size:12px;font-weight:700;border-radius:6px;padding:8px 13px;white-space:nowrap;}
+.bnav{position:absolute;bottom:0;left:0;right:0;height:68px;background:#fff;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;padding-bottom:4px;}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--gray);cursor:pointer;}
+.ni.on{color:var(--navy);}
+.ni-icon{font-size:20px;}
+
+/* ── S2 QUIZ ── */
+#s2{background:#fff;}
+.qtop{background:var(--navy);padding:0 16px 14px;flex-shrink:0;}
+.qtop .sbar{color:#fff;background:transparent;padding:0;}
+.qtnav{display:flex;align-items:center;gap:12px;}
+.back{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;cursor:pointer;flex-shrink:0;}
+.qtitle{font-family:'Roboto Condensed',sans-serif;font-size:17px;font-weight:700;color:#fff;}
+.prow{margin-top:12px;display:flex;align-items:center;gap:10px;}
+.ptrack{flex:1;height:4px;background:rgba(255,255,255,.22);border-radius:10px;overflow:hidden;}
+.pfill{height:100%;background:#fff;border-radius:10px;transition:width .4s cubic-bezier(.4,0,.2,1);}
+.ptxt{font-size:12px;font-weight:700;color:rgba(255,255,255,.8);flex-shrink:0;}
+.qbody{padding:20px 20px 0;flex-shrink:0;}
+.qlabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin-bottom:5px;}
+.qtext{font-family:'Roboto Condensed',sans-serif;font-size:26px;font-weight:700;color:var(--text);line-height:1.15;}
+.sinstr{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;flex-shrink:0;}
+.si{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray);font-weight:500;}
+.sib{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.sib.no{background:#FDECEA;color:var(--red);}
+.sib.yes{background:#E6F4EC;color:var(--green);}
+.si-mid{font-size:11px;color:var(--gray);text-align:center;line-height:1.4;}
+.cstack{position:relative;flex:1;margin:0 20px;display:flex;align-items:center;justify-content:center;overflow:visible;}
+.scard{position:absolute;width:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.10),0 0 0 1px rgba(0,0,0,.05);cursor:grab;user-select:none;transform-origin:bottom center;will-change:transform;}
+.scard:active{cursor:grabbing;}
+.scard.cf{z-index:3;}
+.scard.cb1{transform:scale(0.96) translateY(13px);z-index:2;pointer-events:none;transition:transform .4s cubic-bezier(.4,0,.2,1);}
+.scard.cb2{transform:scale(0.92) translateY(26px);z-index:1;pointer-events:none;transition:transform .4s cubic-bezier(.4,0,.2,1);}
+.cimg{height:160px;display:flex;align-items:center;justify-content:center;font-size:68px;position:relative;}
+.vbadge{position:absolute;top:12px;padding:5px 13px;border-radius:4px;font-family:'Roboto Condensed',sans-serif;font-size:17px;font-weight:700;opacity:0;transition:opacity .1s;border:2.5px solid;pointer-events:none;}
+.vbadge.yes{right:12px;color:var(--green);border-color:var(--green);background:rgba(0,132,61,.08);}
+.vbadge.no{left:12px;color:var(--red);border-color:var(--red);background:rgba(200,16,46,.08);}
+.cbody{padding:14px 16px 16px;border-top:1px solid var(--border);}
+.cq{font-family:'Roboto Condensed',sans-serif;font-size:19px;font-weight:700;color:var(--text);margin-bottom:10px;}
+.copts{display:flex;flex-direction:column;gap:7px;}
+.copt{display:flex;align-items:center;gap:9px;border-radius:5px;padding:10px 12px;font-size:13px;font-weight:500;color:var(--text);}
+.copt-icon{font-size:18px;flex-shrink:0;}
+.copt-dir{margin-left:auto;font-size:11px;font-weight:700;opacity:.6;}
+.copt-yes{background:#EEF2F9;border-left:3px solid var(--navy);}
+.copt-yes .copt-dir{color:var(--green);}
+.copt-no{background:#FDF0F0;border-left:3px solid var(--red);}
+.copt-no .copt-dir{color:var(--red);}
+.abtns{display:flex;gap:14px;justify-content:center;padding:14px 20px 22px;flex-shrink:0;}
+.abtn{display:flex;align-items:center;gap:7px;padding:12px 28px;border-radius:6px;border:none;font-family:'Roboto Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:transform .12s;}
+.abtn:active{transform:scale(.95);}
+.abtn.no{background:var(--bg);color:var(--red);border:1.5px solid var(--border);}
+.abtn.yes{background:var(--navy);color:#fff;}
+
+/* ── S3 LOADING ── */
+#s3{background:var(--navy);justify-content:center;align-items:center;gap:20px;}
+.load-emoji{font-size:64px;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-family:'Roboto Condensed',sans-serif;font-size:22px;font-weight:700;color:#fff;text-align:center;}
+.load-sub{font-size:13px;color:rgba(255,255,255,.6);text-align:center;margin-top:-12px;}
+
+/* ── S4 RÉSULTAT ── */
+#s4{background:#fff;overflow-y:auto;}
+.rtop{background:var(--navy);padding:0 16px 14px;flex-shrink:0;}
+.rtop .sbar{color:#fff;background:transparent;padding:0;}
+.rtnav{display:flex;align-items:center;gap:12px;}
+.rtitle{font-family:'Roboto Condensed',sans-serif;font-size:17px;font-weight:700;color:#fff;}
+.rpcard{margin:14px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.rpimg{background:var(--bg);height:154px;display:flex;align-items:center;justify-content:center;position:relative;}
+.rp-emoji{font-size:76px;animation:popIn .5s .2s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes popIn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+.rec-badge{position:absolute;top:10px;left:10px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:3px;}
+.rpinfo{padding:14px 16px;}
+.rpbrand{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;}
+.rpname{font-family:'Roboto Condensed',sans-serif;font-size:24px;font-weight:700;color:var(--text);margin:2px 0 7px;}
+.rpprice{font-family:'Roboto Condensed',sans-serif;font-size:30px;font-weight:700;color:var(--text);}
+.rpstars{font-size:11px;color:var(--gray);margin-top:3px;}
+.wsec{padding:0 14px 14px;}
+.wtitle{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gray);margin-bottom:9px;}
+.wlist{display:flex;flex-direction:column;gap:7px;}
+.wi{display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--bg);border-radius:6px;border-left:3px solid var(--navy);opacity:0;transform:translateY(10px);}
+.wi.in{animation:fu .35s cubic-bezier(.4,0,.2,1) forwards;}
+@keyframes fu{to{opacity:1;transform:none}}
+.wck{width:28px;height:28px;background:var(--navy);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0;}
+.wtxt{font-size:13px;font-weight:500;color:var(--text);line-height:1.3;}
+.ctasec{padding:0 14px 28px;display:flex;flex-direction:column;gap:10px;}
+.addbtn{width:100%;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:15px;font-family:'Roboto Condensed',sans-serif;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .2s;}
+.addbtn.loading{background:var(--navy-dark);}
+.addbtn.done{background:var(--green);}
+.altbtn{width:100%;background:#fff;color:var(--navy);border:2px solid var(--navy);border-radius:6px;padding:14px;font-family:'Roboto Condensed',sans-serif;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s;}
+.altbtn:active{background:var(--navy-light);}
+
+/* ── S5 PANIER ── */
+#s5{background:var(--bg);}
+.ctop{background:var(--navy);padding:0 16px 14px;flex-shrink:0;}
+.ctop .sbar{color:#fff;background:transparent;padding:0;}
+.ctnav{display:flex;align-items:center;gap:12px;}
+.cttitle{font-family:'Roboto Condensed',sans-serif;font-size:17px;font-weight:700;color:#fff;}
+.cbody{padding:11px;overflow-y:auto;flex:1;}
+.citc{background:#fff;border-radius:8px;padding:13px;display:flex;gap:13px;align-items:flex-start;border:1px solid var(--border);margin-bottom:11px;}
+.cemoji{font-size:50px;flex-shrink:0;}
+.cinfo{flex:1;}
+.cbrand{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;}
+.cname{font-family:'Roboto Condensed',sans-serif;font-size:19px;font-weight:700;color:var(--text);line-height:1.1;margin:2px 0 6px;}
+.qtag{display:inline-flex;align-items:center;gap:4px;background:var(--navy-light);color:var(--navy);border-radius:4px;padding:3px 8px;font-size:10px;font-weight:700;}
+.cpricecol{text-align:right;flex-shrink:0;}
+.cprice{font-family:'Roboto Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--text);}
+.csumc{background:#fff;border-radius:8px;padding:13px;border:1px solid var(--border);}
+.sr{display:flex;justify-content:space-between;font-size:13px;color:var(--gray);margin-bottom:7px;}
+.stot{display:flex;justify-content:space-between;font-family:'Roboto Condensed',sans-serif;font-size:19px;font-weight:700;color:var(--text);border-top:1.5px solid var(--text);padding-top:9px;margin-top:5px;}
+.cobtn{margin:11px;width:calc(100% - 22px);background:var(--navy);color:#fff;border:none;border-radius:6px;padding:15px;font-family:'Roboto Condensed',sans-serif;font-size:18px;font-weight:700;cursor:pointer;}
+
+/* TOAST */
+.toast{position:absolute;top:50px;left:12px;right:12px;background:var(--text);color:#fff;border-radius:7px;padding:11px 15px;display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500;z-index:200;transform:translateY(-14px);opacity:0;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* CONFETTIS */
+#confetti-canvas{position:absolute;inset:0;pointer-events:none;z-index:100;}
+
+.hintbar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;backdrop-filter:blur(6px);white-space:nowrap;pointer-events:none;transition:opacity .5s;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <canvas id="confetti-canvas"></canvas>
+  <div class="toast" id="toast"><span>🛒</span><span id="tmsg">Ajouté !</span></div>
+
+  <!-- S1 CATALOGUE -->
+  <div class="screen active" id="s1">
+    <div class="topbar">
+      <div class="sbar"><span>9:41</span><span style="color:rgba(255,255,255,.9)">●●● 100%</span></div>
+      <div class="tnav">
+        <div class="dec-logo">
+          <svg viewBox="0 0 160 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C6.48 3 2 7.48 2 13v6c0 5.52 4.48 10 10 10h6V3h-6zm0 16H9V7h3c3.31 0 6 2.69 6 6s-2.69 6-6 6z" fill="white"/>
+            <text x="24" y="23" font-family="'Roboto Condensed',sans-serif" font-weight="900" font-size="16" fill="white" letter-spacing="1.5">DECATHLON</text>
+          </svg>
+        </div>
+        <div class="cart-ic" id="gc1">🛒</div>
+      </div>
+      <div class="searchbar"><span>🔍</span><span>Rechercher dans Padel</span></div>
+    </div>
+    <div class="crumb">Sport › Padel › <span>Raquettes</span></div>
+    <div class="cat-row"><div class="cat-title">Raquettes de padel</div><div class="cat-count">42 articles</div></div>
+    <div class="chips">
+      <div class="chip on">Filtres</div>
+      <div class="chip">Débutant</div>
+      <div class="chip">– de 50€</div>
+      <div class="chip">Intermédiaire</div>
+      <div class="chip">Expert</div>
+    </div>
+    <div class="pgrid">
+      <div class="pc" id="pc0"><div class="pc-badge">-20%</div><div class="pc-img">🏓</div><div class="pc-info"><div class="pc-brand">Kuikma</div><div class="pc-name">Raquette Padel PR 530</div><div class="pc-price">29,99€</div><div class="pc-stars">★★★★☆ (148)</div></div></div>
+      <div class="pc" id="pc1"><div class="pc-img">🎾</div><div class="pc-info"><div class="pc-brand">Kuikma</div><div class="pc-name">Raquette Padel PR 730</div><div class="pc-price">49,99€</div><div class="pc-stars">★★★★★ (312)</div></div></div>
+      <div class="pc" id="pc2"><div class="pc-img">🏸</div><div class="pc-info"><div class="pc-brand">Kuikma</div><div class="pc-name">Raquette Padel PR 830</div><div class="pc-price">79,99€</div><div class="pc-stars">★★★★☆ (87)</div></div></div>
+      <div class="pc" id="pc3"><div class="pc-badge">New</div><div class="pc-img">🥇</div><div class="pc-info"><div class="pc-brand">Kuikma</div><div class="pc-name">Raquette Padel PR 990</div><div class="pc-price">129,99€</div><div class="pc-stars">★★★★★ (54)</div></div></div>
+    </div>
+    <div class="banner" id="openq">
+      <div class="ban-l">
+        <div class="ban-icon">🎯</div>
+        <div class="ban-txt"><strong>Pas sûr de ton choix ?</strong><small>Trouve ta raquette en 1 min</small></div>
+      </div>
+      <div class="ban-cta">Démarrer →</div>
+    </div>
+    <div class="bnav">
+      <div class="ni on"><span class="ni-icon">🏠</span><span>Accueil</span></div>
+      <div class="ni"><span class="ni-icon">🔍</span><span>Chercher</span></div>
+      <div class="ni" id="gc2"><span class="ni-icon">🛒</span><span>Panier</span></div>
+      <div class="ni"><span class="ni-icon">👤</span><span>Compte</span></div>
+    </div>
+  </div>
+
+  <!-- S2 QUIZ -->
+  <div class="screen" id="s2">
+    <div class="qtop">
+      <div class="sbar"><span>9:41</span><span style="color:rgba(255,255,255,.9)">●●● 100%</span></div>
+      <div class="qtnav"><div class="back" id="qback">←</div><div class="qtitle">Trouve ta raquette</div></div>
+      <div class="prow"><div class="ptrack"><div class="pfill" id="pf" style="width:0%"></div></div><div class="ptxt" id="pt">0 / 3</div></div>
+    </div>
+    <div class="qbody">
+      <div class="qlabel" id="ql">Question 1</div>
+      <div class="qtext" id="qt">—</div>
+    </div>
+    <div class="sinstr">
+      <div class="si"><div class="sib no">✕</div>Non — gauche</div>
+      <div class="si-mid">Glisse ou utilise<br>les boutons</div>
+      <div class="si"><div class="sib yes">✓</div>Oui — droite</div>
+    </div>
+    <div class="cstack" id="cstack"></div>
+    <div class="abtns">
+      <button class="abtn no" id="bno">✕ Non</button>
+      <button class="abtn yes" id="byes">✓ Oui</button>
+    </div>
+  </div>
+
+  <!-- S3 LOADING -->
+  <div class="screen" id="s3">
+    <div class="load-emoji">🏓</div>
+    <div class="load-txt">Analyse en cours…</div>
+    <div class="load-sub">On cherche ta raquette idéale</div>
+  </div>
+
+  <!-- S4 RÉSULTAT -->
+  <div class="screen" id="s4">
+    <div class="rtop">
+      <div class="sbar"><span>9:41</span><span style="color:rgba(255,255,255,.9)">●●● 100%</span></div>
+      <div class="rtnav"><div class="back" id="rback">←</div><div class="rtitle">Notre recommandation</div></div>
+    </div>
+    <div class="rpcard">
+      <div class="rpimg"><div class="rec-badge">✓ Recommandé pour toi</div><span class="rp-emoji" id="re">🏓</span></div>
+      <div class="rpinfo">
+        <div class="rpbrand">Kuikma — Decathlon</div>
+        <div class="rpname" id="rn">—</div>
+        <div class="rpprice" id="rp">—</div>
+        <div class="rpstars">★★★★★ · 94% des acheteurs similaires recommandent</div>
+      </div>
+    </div>
+    <div class="wsec">
+      <div class="wtitle">Pourquoi cette raquette ?</div>
+      <div class="wlist" id="wl"></div>
+    </div>
+    <div class="ctasec">
+      <button class="addbtn" id="addbtn">🛒 Ajouter au panier</button>
+      <button class="altbtn" id="altbtn">🔍 Voir d'autres produits pouvant me correspondre</button>
+    </div>
+  </div>
+
+  <!-- S5 PANIER -->
+  <div class="screen" id="s5">
+    <div class="ctop">
+      <div class="sbar"><span>9:41</span><span style="color:rgba(255,255,255,.9)">●●● 100%</span></div>
+      <div class="ctnav"><div class="back" id="cback">←</div><div class="cttitle">Mon panier (1 article)</div></div>
+    </div>
+    <div class="cbody">
+      <div class="citc">
+        <div class="cemoji" id="ce">🏓</div>
+        <div class="cinfo">
+          <div class="cbrand">Kuikma — Decathlon</div>
+          <div class="cname" id="cn">—</div>
+          <div class="qtag">🎯 Via le quiz</div>
+        </div>
+        <div class="cpricecol"><div class="cprice" id="cp">—</div></div>
+      </div>
+      <div class="csumc">
+        <div class="sr"><span>Sous-total</span><span id="ss">—</span></div>
+        <div class="sr"><span>Livraison</span><span style="color:var(--green);font-weight:700">Gratuite</span></div>
+        <div class="stot"><span>Total</span><span id="st">—</span></div>
+      </div>
+    </div>
+    <button class="cobtn">Commander →</button>
+  </div>
+</div>
+
+<div class="hintbar" id="hint">💡 Glisse les cartes gauche/droite ou utilise ✕ / ✓</div>
+
+<script>
+/* ── DATA ── */
+const Qs=[
+  {id:'level', text:"C'est ta première raquette de padel ?", emoji:'🏓', bg:'#EEF2F9',
+   opts:[{label:"Oui, je débute",icon:"👋"},{label:"Non, j'ai déjà joué",icon:"🎾"}]},
+  {id:'budget', text:"Ton budget est en dessous de 50€ ?", emoji:'💰', bg:'#F5F5F5',
+   opts:[{label:"Oui, moins de 50€",icon:"💶"},{label:"Non, je peux aller plus haut",icon:"💳"}]},
+  {id:'usage', text:"Tu joues plutôt en loisir entre amis ?", emoji:'🤝', bg:'#F0F7F3',
+   opts:[{label:"Oui, juste pour s'amuser",icon:"😄"},{label:"Non, je joue en compétition",icon:"🏆"}]}
+];
+const PRODS={
+  beginner_low_casual:   {name:'Kuikma PR 530',price:'29,99€',emoji:'🏓',r:['Légère et maniable, idéale pour débuter','Dans ton budget avec de la marge','Parfaite pour les matchs entre amis']},
+  beginner_mid_casual:   {name:'Kuikma PR 730',price:'49,99€',emoji:'🎾',r:['Conçue pour progresser rapidement','Excellent rapport qualité/prix','Polyvalente pour le jeu occasionnel']},
+  beginner_low_competitive:{name:'Kuikma PR 530',price:'29,99€',emoji:'🏓',r:['Bon point de départ avant de progresser','Budget maîtrisé pour commencer','Solide pour s\'initier à la compétition']},
+  beginner_mid_competitive:{name:'Kuikma PR 730',price:'49,99€',emoji:'🎾',r:['Idéale pour débuter la compétition','Cadre structuré pour plus de précision','Rapport qualité/prix optimal']},
+  intermediate_low_casual:{name:'Kuikma PR 530',price:'29,99€',emoji:'🏓',r:['Pratique pour jouer sans prise de tête','Légère et facile à manier','Parfaite pour les sessions décontractées']},
+  intermediate_mid_casual:{name:'Kuikma PR 830',price:'79,99€',emoji:'🏸',r:['Adaptée à ton niveau intermédiaire','Équilibre puissance et contrôle','Idéale pour progresser en loisir']},
+  intermediate_low_competitive:{name:'Kuikma PR 730',price:'49,99€',emoji:'🎾',r:['Bon compromis niveau/budget','Réactive pour les échanges rapides','Appréciée des joueurs de club débutants']},
+  intermediate_mid_competitive:{name:'Kuikma PR 990',price:'99,99€',emoji:'🥇',r:['Haute performance pour la compétition','Cadre rigide pour plus de puissance','Utilisée par les joueurs de club']},
+  default:{name:'Kuikma PR 730',price:'49,99€',emoji:'🎯',r:['Meilleur compromis pour ton profil','Très bien notée par les acheteurs','Polyvalente sur tous les terrains']}
+};
+
+let cur=0, ans={}, prod=null;
+
+/* ── NAV ── */
+function go(id,slide=true){
+  const prev=document.querySelector('.screen.active');
+  const next=document.getElementById(id);
+  if(prev){prev.classList.remove('active');}
+  next.classList.add('active');
+  if(slide){next.classList.add('slide-in');setTimeout(()=>next.classList.remove('slide-in'),400);}
+}
+
+const showToast=(m)=>{
+  const t=document.getElementById('toast');
+  document.getElementById('tmsg').textContent=m;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+};
+
+/* ── PRODUCT LOGIC ── */
+function getProd(){
+  const l=ans.level?'beginner':'intermediate';
+  const b=ans.budget?'low':'mid';
+  const u=ans.usage?'casual':'competitive';
+  return PRODS[`${l}_${b}_${u}`]||PRODS[`${l}_mid_${u}`]||PRODS[`${l}_mid_casual`]||PRODS.default;
+}
+
+/* ── CARDS ── */
+function buildCards(){
+  const stack=document.getElementById('cstack');
+  stack.innerHTML='';
+  const remaining=Qs.slice(cur,cur+3);
+  const classes=['cf','cb1','cb2']; // front first, then behind
+  remaining.forEach((q,i)=>{
+    const el=document.createElement('div');
+    el.className='scard '+classes[i];
+    el.innerHTML=`
+      <div class="cimg" style="background:${q.bg}">
+        <span style="font-size:64px">${q.emoji}</span>
+        <div class="vbadge no">NON ✕</div>
+        <div class="vbadge yes">OUI ✓</div>
+      </div>
+      <div class="cbody">
+        <div class="cq">${q.text}</div>
+        <div class="copts">
+          <div class="copt copt-yes"><span class="copt-icon">${q.opts[0].icon}</span><span>${q.opts[0].label}</span><span class="copt-dir">→ Oui</span></div>
+          <div class="copt copt-no"><span class="copt-icon">${q.opts[1].icon}</span><span>${q.opts[1].label}</span><span class="copt-dir">← Non</span></div>
+        </div>
+      </div>`;
+    stack.appendChild(el);
+  });
+  updateUI();
+  attachSwipe();
+}
+
+function updateUI(){
+  document.getElementById('pf').style.width=Math.round(cur/Qs.length*100)+'%';
+  document.getElementById('pt').textContent=`${cur} / ${Qs.length}`;
+  if(cur<Qs.length){
+    document.getElementById('ql').textContent=`Question ${cur+1}`;
+    document.getElementById('qt').textContent=Qs[cur].text;
+  }
+}
+
+function answer(yes){
+  if(cur>=Qs.length) return;
+  ans[Qs[cur].id]=yes;
+  const f=document.querySelector('.cf');
+  if(!f) return;
+
+  // Lock to prevent double-fire
+  f.style.pointerEvents='none';
+  f.querySelector(yes?'.vbadge.yes':'.vbadge.no').style.opacity='1';
+  f.style.transition='transform .38s cubic-bezier(.4,0,.2,1),opacity .38s';
+  f.style.transform=`translateX(${yes?420:-420}px) rotate(${yes?18:-18}deg)`;
+  f.style.opacity='0';
+
+  cur++;
+
+  setTimeout(()=>{
+    if(cur>=Qs.length){ showLoading(); }
+    else { buildCards(); }
+  },420);
+}
+
+/* ── LOADING THEN RESULT ── */
+function showLoading(){
+  go('s3');
+  setTimeout(()=>showResult(), 1800);
+}
+
+function showResult(){
+  prod=getProd();
+  document.getElementById('re').textContent=prod.emoji;
+  document.getElementById('rn').textContent=prod.name;
+  document.getElementById('rp').textContent=prod.price;
+  const wl=document.getElementById('wl');
+  wl.innerHTML=prod.r.map((r,i)=>`<div class="wi" style="animation-delay:${i*140}ms"><div class="wck">✓</div><div class="wtxt">${r}</div></div>`).join('');
+  // Reset add button state
+  const btn=document.getElementById('addbtn');
+  btn.className='addbtn';btn.textContent='🛒 Ajouter au panier';
+  go('s4');
+  setTimeout(()=>{
+    wl.querySelectorAll('.wi').forEach(el=>el.classList.add('in'));
+    launchConfetti();
+  },300);
+}
+
+/* ── CONFETTIS ── */
+function launchConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+  const colors=['#1B3F7E','#ffffff','#00843D','#C8102E','#2557A7'];
+  const pieces=[];
+  for(let i=0;i<80;i++){
+    pieces.push({
+      x:Math.random()*canvas.width,
+      y:-10-Math.random()*200,
+      r:Math.random()*6+3,
+      d:Math.random()*3+1,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      tilt:Math.random()*10-5,
+      tiltAngle:0,
+      tiltSpeed:Math.random()*.1+.05
+    });
+  }
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      ctx.beginPath();
+      ctx.lineWidth=p.r;
+      ctx.strokeStyle=p.color;
+      ctx.moveTo(p.x+p.tilt+p.r/3,p.y);
+      ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/5);
+      ctx.stroke();
+      p.y+=p.d+1;
+      p.tiltAngle+=p.tiltSpeed;
+      p.tilt=Math.sin(p.tiltAngle)*12;
+    });
+    frame++;
+    if(frame<120) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+
+/* ── SWIPE ── */
+let _onM=null,_onE=null;
+function attachSwipe(){
+  if(_onM){document.removeEventListener("mousemove",_onM);document.removeEventListener("mouseup",_onE);}
+  const card=document.querySelector(".cf");
+  if(!card) return;
+  let sx=0,cx=0,drag=false,done=false;
+  _onM=e=>{
+    if(!drag)return;
+    cx=(e.type==="touchmove"?e.touches[0].clientX:e.clientX)-sx;
+    card.style.transform=`translateX(${cx}px) rotate(${cx*.07}deg)`;
+    const by=card.querySelector(".vbadge.yes"),bn=card.querySelector(".vbadge.no");
+    if(cx>50){by.style.opacity=Math.min((cx-50)/60,1);bn.style.opacity="0";}
+    else if(cx<-50){bn.style.opacity=Math.min((-cx-50)/60,1);by.style.opacity="0";}
+    else{by.style.opacity="0";bn.style.opacity="0";}
+  };
+  _onE=()=>{
+    if(!drag||done)return;drag=false;
+    if(cx>80){done=true;answer(true);}
+    else if(cx<-80){done=true;answer(false);}
+    else{card.style.transition="transform .3s cubic-bezier(.4,0,.2,1)";card.style.transform="";card.querySelectorAll(".vbadge").forEach(b=>b.style.opacity="0");}
+    cx=0;
+  };
+  const onS=e=>{drag=true;sx=e.type==="touchstart"?e.touches[0].clientX:e.clientX;card.style.transition="none";};
+  card.addEventListener("touchstart",onS,{passive:true});
+  card.addEventListener("touchmove",_onM,{passive:true});
+  card.addEventListener("touchend",_onE);
+  card.addEventListener("mousedown",onS);
+  document.addEventListener("mousemove",_onM);
+  document.addEventListener("mouseup",_onE);
+}
+
+/* ── INTRO ANIMATION ── */
+window.addEventListener('load',()=>{
+  [0,1,2,3].forEach(i=>{
+    const el=document.getElementById('pc'+i);
+    if(el){setTimeout(()=>el.classList.add('reveal'),300+i*120);}
+  });
+});
+
+/* ── EVENTS ── */
+document.getElementById('openq').addEventListener('click',()=>{cur=0;ans={};go('s2');buildCards();});
+document.getElementById('qback').addEventListener('click',()=>go('s1'));
+document.getElementById('rback').addEventListener('click',()=>{cur=0;ans={};go('s1');});
+document.getElementById('cback').addEventListener('click',()=>go('s4'));
+document.getElementById('gc1').addEventListener('click',()=>prod?go('s5'):showToast('🛒 Ton panier est vide'));
+document.getElementById('gc2').addEventListener('click',()=>prod?go('s5'):showToast('🛒 Ton panier est vide'));
+document.getElementById('byes').addEventListener('click',()=>answer(true));
+document.getElementById('bno').addEventListener('click',()=>answer(false));
+
+document.getElementById('altbtn').addEventListener('click',()=>{
+  showToast('🔍 Affichage des produits similaires…');
+});
+
+document.getElementById('addbtn').addEventListener('click',()=>{
+  const btn=document.getElementById('addbtn');
+  if(btn.classList.contains('done')) return;
+  btn.classList.add('loading');btn.textContent='⏳ Ajout en cours…';
+  setTimeout(()=>{
+    btn.classList.remove('loading');btn.classList.add('done');btn.textContent='✅ Ajouté au panier !';
+    document.getElementById('ce').textContent=prod.emoji;
+    document.getElementById('cn').textContent=prod.name;
+    document.getElementById('cp').textContent=prod.price;
+    document.getElementById('ss').textContent=prod.price;
+    document.getElementById('st').textContent=prod.price;
+    showToast(`${prod.emoji} ${prod.name} ajouté !`);
+    setTimeout(()=>go('s5'),1100);
+  },750);
+});
+
+setTimeout(()=>{const h=document.getElementById('hint');if(h){h.style.opacity='0';setTimeout(()=>h.remove(),500);}},4500);
+</script>
+</body>
+</html>
